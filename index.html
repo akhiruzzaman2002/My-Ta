@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyTa - মোবাইল বিল্ডার</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        
+        body {
+            background: #f5f7fa;
+            padding: 10px;
+        }
+        
+        .mobile-container {
+            max-width: 100%;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .mobile-header {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .mobile-tabs {
+            display: flex;
+            background: #f8fafc;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            border-right: 1px solid #e5e7eb;
+            cursor: pointer;
+        }
+        
+        .tab.active {
+            background: white;
+            border-bottom: 3px solid #2563eb;
+        }
+        
+        .tab-content {
+            padding: 15px;
+            min-height: 400px;
+        }
+        
+        .element-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .element-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px dashed #d1d5db;
+            cursor: pointer;
+        }
+        
+        .mobile-canvas {
+            background: #f8fafc;
+            min-height: 500px;
+            padding: 15px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 10px;
+        }
+        
+        .mobile-element {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #2563eb;
+        }
+        
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 15px;
+        }
+        
+        .mobile-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <div class="mobile-header">
+            <h2>📱 MyTa মোবাইল বিল্ডার</h2>
+            <p>ফোনে ওয়েবসাইট তৈরি করুন</p>
+        </div>
+        
+        <div class="mobile-tabs">
+            <div class="tab active" onclick="showTab('elements')">এলিমেন্টস</div>
+            <div class="tab" onclick="showTab('canvas')">ক্যানভাস</div>
+            <div class="tab" onclick="showTab('properties')">সেটিংস</div>
+        </div>
+        
+        <div class="tab-content">
+            <!-- এলিমেন্টস ট্যাব -->
+            <div id="elements-tab">
+                <div class="element-list">
+                    <div class="element-card" onclick="addMobileElement('header')">
+                        <h3>📝 হেডার</h3>
+                        <p>টাইটেল এবং সাবটাইটেল</p>
+                    </div>
+                    <div class="element-card" onclick="addMobileElement('text')">
+                        <h3>📄 টেক্সট</h3>
+                        <p>প্যারাগ্রাফ এবং কন্টেন্ট</p>
+                    </div>
+                    <div class="element-card" onclick="addMobileElement('button')">
+                        <h3>🔘 বাটন</h3>
+                        <p>কল-টু-অ্যাকশন</p>
+                    </div>
+                    <div class="element-card" onclick="addMobileElement('image')">
+                        <h3>🖼️ ইমেজ</h3>
+                        <p>ছবি এবং graphics</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ক্যানভাস ট্যাব -->
+            <div id="canvas-tab" style="display: none;">
+                <div class="mobile-canvas" id="mobile-canvas">
+                    <div class="mobile-element">
+                        <h3>আপনার ওয়েবসাইট</h3>
+                        <p>এলিমেন্টস ট্যাব থেকে আইটেম যোগ করুন</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- প্রোপার্টিস ট্যাব -->
+            <div id="properties-tab" style="display: none;">
+                <h3>সেটিংস এবং এক্সপোর্ট</h3>
+                <div class="action-buttons">
+                    <button class="mobile-btn" onclick="saveMobileProject()">💾 সেভ করুন</button>
+                    <button class="mobile-btn" onclick="previewMobileSite()">👁️ প্রিভিউ</button>
+                    <button class="mobile-btn" onclick="publishMobileSite()">📤 এক্সপোর্ট</button>
+                    <button class="mobile-btn" style="background: #ef4444;" onclick="resetMobileProject()">🔄 রিসেট</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ট্যাব ম্যানেজমেন্ট
+        function showTab(tabName) {
+            // সব ট্যাব হাইড করুন
+            document.getElementById('elements-tab').style.display = 'none';
+            document.getElementById('canvas-tab').style.display = 'none';
+            document.getElementById('properties-tab').style.display = 'none';
+            
+            // সব ট্যাব একটিভ ক্লাস রিমুভ করুন
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // সিলেক্টেড ট্যাব শো করুন
+            document.getElementById(tabName + '-tab').style.display = 'block';
+            event.target.classList.add('active');
+        }
+        
+        // মোবাইল এলিমেন্ট এড করুন
+        function addMobileElement(type) {
+            const canvas = document.getElementById('mobile-canvas');
+            let elementHtml = '';
+            
+            switch(type) {
+                case 'header':
+                    elementHtml = `
+                        <div class="mobile-element">
+                            <h3 contenteditable="true">নতুন হেডিং</h3>
+                            <p contenteditable="true">হেডিং এর বর্ণনা...</p>
+                        </div>
+                    `;
+                    break;
+                case 'text':
+                    elementHtml = `
+                        <div class="mobile-element">
+                            <p contenteditable="true">এখানে আপনার টেক্সট লিখুন... আপনি আপনার ওয়েবসাইটের কন্টেন্ট এডিট করতে পারেন।</p>
+                        </div>
+                    `;
+                    break;
+                case 'button':
+                    elementHtml = `
+                        <div class="mobile-element">
+                            <button style="padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 5px; width: 100%;">
+                                ক্লিক করুন
+                            </button>
+                        </div>
+                    `;
+                    break;
+                case 'image':
+                    elementHtml = `
+                        <div class="mobile-element">
+                            <div style="background: #f3f4f6; padding: 40px; text-align: center; border-radius: 5px;">
+                                🖼️ ইমেজ প্লেসহোল্ডার
+                            </div>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            canvas.innerHTML += elementHtml;
+            showTab('canvas');
+            alert('এলিমেন্ট যোগ করা হয়েছে! ক্যানভাস ট্যাবে দেখুন।');
+        }
+        
+        // প্রোজেক্ট সেভ করুন
+        function saveMobileProject() {
+            const content = document.getElementById('mobile-canvas').innerHTML;
+            localStorage.setItem('mobile-website', content);
+            alert('প্রজেক্ট সেভ করা হয়েছে!');
+        }
+        
+        // প্রিভিউ দেখুন
+        function previewMobileSite() {
+            const content = document.getElementById('mobile-canvas').innerHTML;
+            const previewHtml = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>প্রিভিউ - MyTa</title>
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <style>
+                        body { font-family: Arial; padding: 20px; }
+                        .mobile-element { margin: 20px 0; padding: 15px; background: white; border-radius: 10px; }
+                    </style>
+                </head>
+                <body>${content}</body>
+                </html>
+            `;
+            
+            const newWindow = window.open('', '_blank');
+            newWindow.document.write(previewHtml);
+        }
+        
+        // ওয়েবসাইট পাবলিশ করুন
+        function publishMobileSite() {
+            const content = document.getElementById('mobile-canvas').innerHTML;
+            const fullHtml = `
+                <!DOCTYPE html>
+                <html lang="bn">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>আমার ওয়েবসাইট</title>
+                    <style>
+                        body { 
+                            font-family: Arial, sans-serif;
+                            max-width: 100%;
+                            margin: 0 auto;
+                            padding: 20px;
+                            background: #f5f7fa;
+                        }
+                        .mobile-element {
+                            background: white;
+                            padding: 20px;
+                            margin: 15px 0;
+                            border-radius: 10px;
+                            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${content}
+                </body>
+                </html>
+            `;
+            
+            // ডাউনলোড করার জন্য ব্লব তৈরি করুন
+            const blob = new Blob([fullHtml], {type: 'text/html'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'my-mobile-website.html';
+            a.click();
+            
+            alert('ওয়েবসাইট ডাউনলোড করা হয়েছে!');
+        }
+        
+        // প্রোজেক্ট রিসেট করুন
+        function resetMobileProject() {
+            if (confirm('আপনি কি প্রজেক্ট রিসেট করতে চান?')) {
+                document.getElementById('mobile-canvas').innerHTML = `
+                    <div class="mobile-element">
+                        <h3>আপনার ওয়েবসাইট</h3>
+                        <p>এলিমেন্টস ট্যাব থেকে আইটেম যোগ করুন</p>
+                    </div>
+                `;
+                localStorage.removeItem('mobile-website');
+            }
+        }
+        
+        // পেজ লোড হলে সেভ করা ডেটা লোড করুন
+        window.addEventListener('load', function() {
+            const saved = localStorage.getItem('mobile-website');
+            if (saved) {
+                document.getElementById('mobile-canvas').innerHTML = saved;
+            }
+        });
+    </script>
+</body>
+</html>
